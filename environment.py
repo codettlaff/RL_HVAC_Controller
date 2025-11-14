@@ -17,16 +17,19 @@ class HVACTrainingEnv(gym.Env):
 
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 30}
 
-    def __init__(self, render_mode: Optional[str] = None, **env_config):
+    def __init__(self, price_profile_df, outdoor_temperature_df, render_mode: Optional[str] = None, **env_config):
 
         super().__init__()
+
+        # ----- Shapes -----
+        self.price_profile = price_profile_df
+        self.outdoor_temperature = outdoor_temperature_df
 
         # ----- Environment Variables -----
         self.electricity_price = 0.0
         self.indoor_temperature = 0.0
         self.outdoor_temperature = 0.0
-        self.datetime = env_config.get("start_datetime", '2025-01-01T00:00:00')
-        self.time_of_day = int((pd.to_datetime(self.datetime).hour * 60 + pd.to_datetime(self.datetime).minute) / 5)
+        self.time_of_day = 0
 
         # ----- Save config and render mode -----
         self.render_mode = render_mode

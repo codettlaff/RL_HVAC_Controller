@@ -1,8 +1,13 @@
+import os
+import pandas as pd
 from environment import HVACTrainingEnv
 
 def simulation_loop():
 
-    env = HVACTrainingEnv(render_mode="human", max_steps=10)
+    data_folderpath = os.path.join(os.path.dirname(__file__), 'data')
+    price_profile_df = pd.read_csv(os.path.join(data_folderpath, 'electricity_price.csv'))
+    outdoor_temperature_df = pd.read_csv(os.path.join(data_folderpath, 'outdoor_temperature.csv'))
+    env = HVACTrainingEnv(price_profile_df, outdoor_temperature_df, render_mode="human", max_steps=10)
 
     obs, info = env.reset()
     done = False
