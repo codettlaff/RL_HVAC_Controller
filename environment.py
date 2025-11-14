@@ -5,6 +5,13 @@ import numpy as np
 import pandas as pd
 from typing import Optional, Tuple, Dict, Any
 
+# State Vector:
+# 1. Indoor Temperature (Float 10.0 - 40.0)
+# 2. Outdoor Temperature (Float 20.0 - 50.0)
+# 3. Electricity Price (Float 0.0 - 2.0)
+# 4. Time Index (Int 0-287)
+# 5. HVAC ON/ OFF (Int 0-1)
+
 
 class HVACTrainingEnv(gym.Env):
 
@@ -54,7 +61,6 @@ class HVACTrainingEnv(gym.Env):
         })
 
         # Internal state
-        self.state: Optional[np.ndarray] = None # Stores internal state of the environment.
         self.current_step: int = 0
         self.max_steps: int = env_config.get("max_steps", 100)
 
@@ -99,6 +105,9 @@ class HVACTrainingEnv(gym.Env):
         info = self._get_info()
         return obs, info
 
+    def _get_reward(self):
+        return 1 # Placeholder
+
     def step(
         self, action: np.ndarray
     ) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
@@ -115,12 +124,17 @@ class HVACTrainingEnv(gym.Env):
         # Example: simple state update (replace with your dynamics)
         self.current_step += 1
 
-        # Dummy transition: add action value to first state dimension
-        self.state[0] += float(action[0])
+        # ----- Compute reward -----
+        hvac_mode = action
+
+        # ----- Update Environment Variables -----
+        # 1. Update Outdoor Temperature from Shape
+        # 2. Update Electricity Price from Shape
+        # 3. Update datetime, time_of_day
+        # 4. Update Indoor Temperature from Building Model
 
         # ----- Compute reward -----
-        # Example: negative absolute value of first state element
-        reward = -abs(self.state[0])
+        reward = self._get_reward()
 
         # ----- Check termination conditions -----
         # terminated: task completed or failed (absorbing)

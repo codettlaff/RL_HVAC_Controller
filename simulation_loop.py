@@ -14,3 +14,5 @@ def simulation_loop():
         env.render()
 
     env.close()
+
+simulation_loop()
