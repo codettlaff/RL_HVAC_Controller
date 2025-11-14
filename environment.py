@@ -22,8 +22,8 @@ class HVACTrainingEnv(gym.Env):
         super().__init__()
 
         # ----- Shapes -----
-        self.price_profile = price_profile_df
-        self.outdoor_temperature = outdoor_temperature_df
+        self.price_profile = price_profile_df["electricity_price"].to_numpy()
+        self.outdoor_temperature_profile = outdoor_temperature_df["outdoor_temperature"].to_numpy()
 
         # ----- Environment Variables -----
         self.electricity_price = 0.0
@@ -132,7 +132,9 @@ class HVACTrainingEnv(gym.Env):
 
         # ----- Update Environment Variables -----
         # 1. Update Outdoor Temperature from Shape
+        self.electricity_price = self.price_profile[self.time_of_day]
         # 2. Update Electricity Price from Shape
+        self.outdoor_temperature = self.outdoor_temperature_profile[self.time_of_day]
         # 3. Update datetime, time_of_day
         # 4. Update Indoor Temperature from Building Model
 
