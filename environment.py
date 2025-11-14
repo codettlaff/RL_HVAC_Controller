@@ -69,9 +69,9 @@ class HVACTrainingEnv(gym.Env):
 
     def _get_obs(self) -> np.ndarray:
         return {
-        "electricity_price": np.array([self.electricity_price], dtype=np.float32),
-        "indoor_temperature": np.array([self.indoor_temperature], dtype=np.float32),
-        "outdoor_temperature": np.array([self.outdoor_temperature], dtype=np.float32),
+        "electricity_price": self.electricity_price,
+        "indoor_temperature": self.indoor_temperature,
+        "outdoor_temperature": self.outdoor_temperature,
         "time_of_day": self.time_of_day }
 
     def _get_info(self) -> Dict[str, Any]:
