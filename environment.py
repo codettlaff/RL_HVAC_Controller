@@ -131,9 +131,7 @@ class HVACTrainingEnv(gym.Env):
         # ----- Apply action & update state -----
         # Example: simple state update (replace with your dynamics)
         self.current_step += 1
-
-        # ----- Compute reward -----
-        hvac_mode = action
+        self.hvac_load = action * 2.5
 
         # ----- Update Environment Variables -----
         self.time_of_day += 1
