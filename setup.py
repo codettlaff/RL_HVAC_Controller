@@ -75,5 +75,53 @@ def generate_outdoor_temperature_profile():
 
     return temp_5min
 
-generate_outdoor_temperature_profile()
+def generate_non_hvac_load_profile():
+    """
+    Generates a realistic non-HVAC load profile (kW) for a single building cluster.
+    Shape resembles plug loads, lighting, appliances, and general usage.
+    Saved as: data/non_hvac_load.csv
+    """
+
+    # Typical hourly non-HVAC load shape (kW)
+    # Represents common lighting + appliances + plug load behavior
+    hourly_load = np.array([
+        0.18, 0.17, 0.16, 0.16,      # 12am–4am: overnight baseline
+        0.18, 0.22,                  # 4am–6am: morning warm-up
+        0.30, 0.38, 0.42,            # 6am–9am: morning usage peak
+        0.35, 0.32, 0.28,            # 9am–12pm: late morning dip
+        0.26, 0.25, 0.24,            # 12pm–3pm: midday low use
+        0.28, 0.35,                  # 3pm–5pm: ramp
+        0.55, 0.70, 0.85,            # 5pm–8pm: strong evening peak
+        0.60, 0.40,                  # 8pm–10pm: evening cool-down
+        0.30, 0.22                   # 10pm–12am: night wind-down
+    ])
+
+    # Interpolate to 5-minute resolution (288 points)
+    load_5min = np.interp(
+        np.linspace(0, 23, 288),
+        np.arange(24),
+        hourly_load
+    )
+
+    # Add noise (±5% of load value)
+    noise = np.random.normal(scale=0.05, size=288)  # 5% variation
+    load_5min = load_5min * (1 + noise)
+
+    # Clip to realistic ranges for plug loads (0.1 kW to ~2.0 kW)
+    load_5min = np.clip(load_5min, 0.1, 2.0)
+
+    # Save to CSV
+    csv_filepath = os.path.join(os.path.dirname(__file__), 'data', 'non_hvac_load.csv')
+
+    df = pd.DataFrame({
+        "time_of_day": range(len(load_5min)),   # 0–287
+        "non_hvac_kw": load_5min
+    })
+
+    df.to_csv(csv_filepath, index=False)
+
+    return load_5min
+
+# generate_outdoor_temperature_profile()
+generate_non_hvac_load_profile()
 

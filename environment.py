@@ -26,7 +26,7 @@ class HVACTrainingEnv(gym.Env):
         # ----- Shapes -----
         self.price_profile = price_profile_df["electricity_price"].to_numpy()
         self.outdoor_temperature_profile = outdoor_temperature_df["outdoor_temperature"].to_numpy()
-        self.non_hvac_load_profile = non_hvac_load_df["kW"].to_numpy()
+        self.non_hvac_load_profile = non_hvac_load_df["non_hvac_kw"].to_numpy()
 
         # ----- Environment Variables -----
         self.electricity_price = 0.0
