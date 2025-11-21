@@ -14,11 +14,15 @@ def simulation_loop():
     done = False
     truncated = False
 
+    total_reward = 0
+
     while not (done or truncated):
         action = env.action_space.sample()
         obs, reward, done, truncated, info = env.step(action)
+        total_reward += reward
         env.render()
 
     env.close()
+    print("Total Reward: ", total_reward)
 
 simulation_loop()
