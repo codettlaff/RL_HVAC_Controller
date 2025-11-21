@@ -76,7 +76,6 @@ class HVACTrainingEnv(gym.Env):
         return {
         "electricity_price": self.electricity_price,
         "indoor_temperature": self.indoor_temperature,
-        "outdoor_temperature": self.outdoor_temperature,
         "time_of_day": self.time_of_day }
 
     def _get_info(self) -> Dict[str, Any]:
