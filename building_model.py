@@ -78,8 +78,8 @@ def rc_building_model(timestep_minutes, non_hvac_kw_demand, hvac_kw_demand, indo
     parameters = {
         'num_states': 1,
         'num_inputs': 6,
-        'r_win': 0.2,  # thermal resistance of windows K/kW
-        'c_in': 14551661,  # thermal capacitance of indoor air (J/K) = 4.04 kWh/K
+        'r_win': 0.05,  # thermal resistance of windows K/kW
+        'c_in': 1e6,  # thermal capacitance of indoor air (J/K) = 4.04 kWh/K
         'c1': 1.0,
         'c2': 0.967,
         'c3': 0.099

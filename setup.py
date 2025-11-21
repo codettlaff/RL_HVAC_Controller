@@ -37,16 +37,17 @@ def generate_price_profile():
 def generate_outdoor_temperature_profile():
     # Base outdoor temperature shape (hourly)
     # Represents a typical mild-climate day (in °C)
+
     hourly_temps = np.array([
-        12, 11, 10, 10,          # 12am–4am cooling
-        11, 13,                  # 4am–6am early morning warmup
-        16, 18, 20,              # 6am–9am warming
-        22, 24, 26,              # 9am–12pm mid-day warming
-        27, 28, 29,              # 12pm–3pm afternoon peak
-        28, 26,                  # 3pm–5pm cooling starts
-        24, 22, 20,              # 5pm–8pm evening cooling
-        18, 16,                  # 8pm–10pm late evening
-        14, 13                   # 10pm–12am night cooling
+        24, 23, 22, 22,  # 12am–4am: warm overnight low (72–75°F)
+        23, 25,  # 4am–6am: early morning warming
+        28, 30, 32,  # 6am–9am: warming quickly
+        34, 36, 38,  # 9am–12pm: mid-day strong heat
+        39, 40, 41,  # 12pm–3pm: peak heat (41°C ≈ 106°F)
+        40, 38,  # 3pm–5pm: slow cooling
+        36, 34, 32,  # 5pm–8pm: evening cooling
+        30, 28,  # 8pm–10pm: late evening
+        26, 25  # 10pm–12am: nighttime but still hot
     ])
 
     # Interpolate to 5-minute resolution (288 points)
@@ -123,5 +124,5 @@ def generate_non_hvac_load_profile():
     return load_5min
 
 # generate_outdoor_temperature_profile()
-generate_non_hvac_load_profile()
+# generate_non_hvac_load_profile()
 
