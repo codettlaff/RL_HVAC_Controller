@@ -19,7 +19,7 @@ def simulation_loop():
 
     while not (done or truncated):
         action = env.action_space.sample()
-        action = 0
+        action = 1
         obs, reward, done, truncated, info = env.step(action)
         total_reward += reward
         building_temperature.append(obs['indoor_temperature'])
