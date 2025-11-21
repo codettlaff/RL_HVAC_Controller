@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 from typing import Optional, Tuple, Dict, Any
 
+from building_model import rc_building_model
+
 # State Vector:
 # 1. Indoor Temperature (Float 10.0 - 40.0)
 # 2. Outdoor Temperature (Float 20.0 - 50.0)
@@ -17,19 +19,22 @@ class HVACTrainingEnv(gym.Env):
 
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 30}
 
-    def __init__(self, price_profile_df, outdoor_temperature_df, render_mode: Optional[str] = None, **env_config):
+    def __init__(self, price_profile_df, outdoor_temperature_df, non_hvac_load_df, render_mode: Optional[str] = None, **env_config):
 
         super().__init__()
 
         # ----- Shapes -----
         self.price_profile = price_profile_df["electricity_price"].to_numpy()
         self.outdoor_temperature_profile = outdoor_temperature_df["outdoor_temperature"].to_numpy()
+        self.non_hvac_load_profile = non_hvac_load_df["kW"].to_numpy()
 
         # ----- Environment Variables -----
         self.electricity_price = 0.0
-        self.indoor_temperature = 0.0
+        self.indoor_temperature = 25.6
         self.outdoor_temperature = 0.0
         self.time_of_day = 0
+        self.non_hvac_load = 0.0
+        self.hvac_load = 0.0
 
         # ----- Save config and render mode -----
         self.render_mode = render_mode
@@ -131,12 +136,15 @@ class HVACTrainingEnv(gym.Env):
         hvac_mode = action
 
         # ----- Update Environment Variables -----
+        self.time_of_day += 1
         # 1. Update Outdoor Temperature from Shape
         self.electricity_price = self.price_profile[self.time_of_day]
         # 2. Update Electricity Price from Shape
         self.outdoor_temperature = self.outdoor_temperature_profile[self.time_of_day]
-        # 3. Update datetime, time_of_day
+        # 3. Update Non Hvac Load From Shape
+        self.non_hvac_load = self.non_hvac_load_profile[self.time_of_day]
         # 4. Update Indoor Temperature from Building Model
+        self.indoor_temperature, building_kw_demand, building_kvar_demand = rc_building_model(5, self.non_hvac_load, self.hvac_load, self.indoor_temperature, self.outdoor_temperature)
 
         # ----- Compute reward -----
         reward = self._get_reward()
