@@ -16,13 +16,17 @@ def simulation_loop():
 
     total_reward = 0
     building_temperature = []
+    action = env.action_space.sample()
 
     while not (done or truncated):
-        action = env.action_space.sample()
-        action = 1
+
+
         obs, reward, done, truncated, info = env.step(action)
         total_reward += reward
-        building_temperature.append(obs['indoor_temperature'])
+
+        building_temperature.append(obs['indoor_temperature'][0])
+        if building_temperature[-1] > 21.67: action = 1
+        else: action = 0
         env.render()
 
     env.close()
