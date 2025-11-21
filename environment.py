@@ -30,7 +30,7 @@ class HVACTrainingEnv(gym.Env):
 
         # ----- Environment Variables -----
         self.electricity_price = 0.0
-        self.indoor_temperature = 25.6
+        self.indoor_temperature = 20.56
         self.outdoor_temperature = 0.0
         self.time_of_day = 0
         self.non_hvac_load = 0.0
@@ -114,7 +114,8 @@ class HVACTrainingEnv(gym.Env):
         return obs, info
 
     def _get_reward(self):
-        return 1 # Placeholder
+        if self.indoor_temperature > 20 and self.indoor_temperature < 21.67: return 0
+        else: return -1
 
     def step(
         self, action: np.ndarray
