@@ -134,4 +134,4 @@ def rc_building_model(timestep_minutes, non_hvac_kw_demand, hvac_kw_demand, indo
 
     building_kvar_demand = hvac_kvar_demand + non_hvac_kvar_demand
 
-    return x_k_1, building_kw_demand, building_kvar_demand
+    return x_k_1[0], building_kw_demand, building_kvar_demand
