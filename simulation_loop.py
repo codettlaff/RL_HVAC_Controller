@@ -7,7 +7,7 @@ import numpy as np
 
 def simulation_loop():
 
-    mode = 'baseline'
+    mode = 'model'
 
     data_folderpath = os.path.join(os.path.dirname(__file__), 'data')
     price_profile_df = pd.read_csv(os.path.join(data_folderpath, 'electricity_price.csv'))

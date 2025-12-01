@@ -29,6 +29,7 @@ class HVACTrainingEnv(gym.Env):
         self.non_hvac_load_profile = non_hvac_load_df["non_hvac_kw"].to_numpy()
 
         # ----- Environment Variables -----
+        self.state = 0
         self.electricity_price = 0.0
         self.indoor_temperature = 20.56
         self.outdoor_temperature = 0.0
@@ -117,32 +118,6 @@ class HVACTrainingEnv(gym.Env):
 
         return obs, info
 
-    def reset_old(
-        self,
-        *,
-        seed: Optional[int] = None,
-        options: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[np.ndarray, Dict[str, Any]]:
-        """
-        Reset the environment to an initial state and return (observation, info).
-
-        Gymnasium API: reset must accept keyword-only seed, options.
-        """
-        super().reset(seed=seed)
-        # If you want reproducibility based on seed, you can use self.np_random here
-
-        self.current_step = 0
-
-        # Initialize state (example: zeros)
-        self.state = np.zeros(self.observation_space.shape, dtype=np.float32)
-
-        # Optionally randomize initial state
-        # self.state = self.np_random.normal(size=self.observation_space.shape).astype(np.float32)
-
-        obs = self._get_obs()
-        info = self._get_info()
-        return obs, info
-
     def _get_reward(self, last_timestep_hvac_load):
         """
         Computes reward based on:
@@ -202,6 +177,7 @@ class HVACTrainingEnv(gym.Env):
         self.current_step += 1
         last_timestep_hvac_load = self.hvac_load
         self.hvac_load = action * 2.5
+        self.state = action
 
         # ----- Update Environment Variables -----
         self.time_of_day += 1
