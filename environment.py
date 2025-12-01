@@ -76,6 +76,7 @@ class HVACTrainingEnv(gym.Env):
         return {
         "electricity_price": self.electricity_price,
         "indoor_temperature": self.indoor_temperature,
+        "outdoor_temperature": self.outdoor_temperature,
         "time_of_day": self.time_of_day }
 
     def _get_info(self) -> Dict[str, Any]:
@@ -112,9 +113,42 @@ class HVACTrainingEnv(gym.Env):
         info = self._get_info()
         return obs, info
 
-    def _get_reward(self):
-        if self.indoor_temperature > 20 and self.indoor_temperature < 21.67: return 0
-        else: return -1
+    def _get_reward(self, last_timestep_hvac_load):
+        """
+        Computes reward based on:
+          - Staying in comfort band (20°C to 21.67°C)
+          - Avoiding HVAC on/off switching
+          - Minimizing energy use during high price periods
+        """
+
+        # --- Comfort penalty ---
+        # Comfort band: 20°C – 21.67°C
+        T = self.indoor_temperature
+        comfort_lower = 20.0
+        comfort_upper = 21.67
+
+        if T < comfort_lower:
+            comfort_penalty = (comfort_lower - T) * 2.0
+        elif T > comfort_upper:
+            comfort_penalty = (T - comfort_upper) * 2.0
+        else:
+            comfort_penalty = 0.0
+
+        # --- Switching penalty ---
+        # Penalize toggling HVAC on/off
+        switching_penalty = 1.0 if (last_timestep_hvac_load != self.hvac_load) else 0.0
+
+        # --- Price penalty ---
+        # Higher price → larger penalty for HVAC power
+        # Price in [0.1, 0.2]
+        price = self.electricity_price
+        price_penalty = price * self.hvac_load
+
+        # --- Total reward ---
+        # Negative because each is a penalty
+        total_penalty = comfort_penalty + switching_penalty + price_penalty
+
+        return -total_penalty
 
     def step(
         self, action: np.ndarray
@@ -131,21 +165,22 @@ class HVACTrainingEnv(gym.Env):
         # ----- Apply action & update state -----
         # Example: simple state update (replace with your dynamics)
         self.current_step += 1
+        last_timestep_hvac_load = self.hvac_load
         self.hvac_load = action * 2.5
 
         # ----- Update Environment Variables -----
         self.time_of_day += 1
         # 1. Update Outdoor Temperature from Shape
-        self.electricity_price = self.price_profile[self.time_of_day]
+        self.electricity_price = self.price_profile[self.time_of_day-1]
         # 2. Update Electricity Price from Shape
-        self.outdoor_temperature = self.outdoor_temperature_profile[self.time_of_day]
+        self.outdoor_temperature = self.outdoor_temperature_profile[self.time_of_day-1]
         # 3. Update Non Hvac Load From Shape
-        self.non_hvac_load = self.non_hvac_load_profile[self.time_of_day]
+        self.non_hvac_load = self.non_hvac_load_profile[self.time_of_day-1]
         # 4. Update Indoor Temperature from Building Model
         self.indoor_temperature, building_kw_demand, building_kvar_demand = rc_building_model(5, self.non_hvac_load, self.hvac_load, self.indoor_temperature, self.outdoor_temperature)
 
         # ----- Compute reward -----
-        reward = self._get_reward()
+        reward = self._get_reward(last_timestep_hvac_load)
 
         # ----- Check termination conditions -----
         # terminated: task completed or failed (absorbing)

@@ -19,9 +19,14 @@ def train_MDP_controller(env):
     model.learn(total_timesteps=287)
     model.save("hvac_dqn")
 
+'''
 data_folderpath = os.path.join(os.path.dirname(__file__), 'data')
 price_profile_df = pd.read_csv(os.path.join(data_folderpath, 'electricity_price.csv'))
 outdoor_temperature_df = pd.read_csv(os.path.join(data_folderpath, 'outdoor_temperature.csv'))
-env = HVACTrainingEnv(price_profile_df, outdoor_temperature_df, render_mode="human", max_steps=287)
+non_hvac_load_df = pd.read_csv(os.path.join(data_folderpath, 'non_hvac_load.csv'))
+env = HVACTrainingEnv(price_profile_df, outdoor_temperature_df, non_hvac_load_df, render_mode="human", max_steps=288)
 train_MDP_controller(env)
-model = DQN.load("hvac_dqn", env=env)
+'''
+
+
+

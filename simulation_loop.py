@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 from environment import HVACTrainingEnv
+from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3 import DQN
+import numpy as np
 
 def simulation_loop():
 
@@ -18,6 +21,9 @@ def simulation_loop():
     building_temperature = []
     action = env.action_space.sample()
 
+    # --- Load the trained DQN model ---
+    model = DQN.load("hvac_dqn.zip", env=env)
+
     while not (done or truncated):
 
 
@@ -25,8 +31,20 @@ def simulation_loop():
         total_reward += reward
 
         building_temperature.append(obs['indoor_temperature'][0])
-        if building_temperature[-1] > 21.67: action = 1
-        else: action = 0
+        # if building_temperature[-1] > 21.67: action = 1
+        # else: action = 0
+        # --- Get action from trained RL model ---
+        processed_obs = {}
+
+        for k, v in obs.items():
+            # Convert ints/floats/lists to np.array
+            if not isinstance(v, np.ndarray):
+                v = np.array([v], dtype=np.float32)
+            # Ensure shape is (1, n)
+            v = v.reshape(1, -1)
+            processed_obs[k] = v
+
+        action, _ = model.predict(processed_obs, deterministic=True)
         env.render()
 
     env.close()
