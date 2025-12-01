@@ -65,19 +65,25 @@ class HVACTrainingEnv(gym.Env):
                 shape=(1,),
                 dtype=np.float32
             ),
-            "time_of_day": spaces.Discrete(288)   # 5-minute index: {0, ..., 287}
+            "time_of_day": spaces.Box(
+                low=0.0,
+                high=287.0,
+                shape=(1,),
+                dtype=np.float32
+            )   # 5-minute index: {0, ..., 287}
         })
 
         # Internal state
         self.current_step: int = 0
         self.max_steps: int = env_config.get("max_steps", 100)
 
-    def _get_obs(self) -> np.ndarray:
+    def _get_obs(self) -> Dict[str, np.ndarray]:
         return {
-        "electricity_price": self.electricity_price,
-        "indoor_temperature": self.indoor_temperature,
-        "outdoor_temperature": self.outdoor_temperature,
-        "time_of_day": self.time_of_day }
+            "electricity_price": np.array([self.electricity_price], dtype=np.float32),
+            "indoor_temperature": np.array([self.indoor_temperature], dtype=np.float32),
+            "outdoor_temperature": np.array([self.outdoor_temperature], dtype=np.float32),
+            "time_of_day": np.array([self.time_of_day], dtype=np.float32),
+        }
 
     def _get_info(self) -> Dict[str, Any]:
         """
@@ -88,6 +94,30 @@ class HVACTrainingEnv(gym.Env):
         }
 
     def reset(
+            self,
+            *,
+            seed: Optional[int] = None,
+            options: Optional[Dict[str, Any]] = None,
+    ):
+        super().reset(seed=seed)
+
+        self.current_step = 0
+
+        # Reset building internal state variables
+        self.time_of_day = 0
+        self.indoor_temperature = 20.56
+        self.outdoor_temperature = float(self.outdoor_temperature_profile[0])
+        self.electricity_price = float(self.price_profile[0])
+        self.non_hvac_load = float(self.non_hvac_load_profile[0])
+
+        # Build obs explicitly
+        obs = self._get_obs()
+
+        info = {}
+
+        return obs, info
+
+    def reset_old(
         self,
         *,
         seed: Optional[int] = None,
@@ -128,9 +158,9 @@ class HVACTrainingEnv(gym.Env):
         comfort_upper = 21.67
 
         if T < comfort_lower:
-            comfort_penalty = (comfort_lower - T[0]) * 2.0
+            comfort_penalty = (comfort_lower - T) * 2.0
         elif T > comfort_upper:
-            comfort_penalty = (T[0] - comfort_upper) * 2.0
+            comfort_penalty = (T - comfort_upper) * 2.0
         else:
             comfort_penalty = 0.0
 
@@ -183,13 +213,15 @@ class HVACTrainingEnv(gym.Env):
         self.non_hvac_load = self.non_hvac_load_profile[self.time_of_day-1]
         # 4. Update Indoor Temperature from Building Model
         self.indoor_temperature, building_kw_demand, building_kvar_demand = rc_building_model(5, self.non_hvac_load, self.hvac_load, self.indoor_temperature, self.outdoor_temperature)
+        self.indoor_temperature = self.indoor_temperature[0]
 
         # ----- Compute reward -----
         reward = self._get_reward(last_timestep_hvac_load)
 
         # ----- Check termination conditions -----
         # terminated: task completed or failed (absorbing)
-        terminated = False  # e.g. abs(self.state[0]) > 10
+        # terminated = False  # e.g. abs(self.state[0]) > 10
+        terminated = self.current_step >= self.max_steps
 
         # truncated: time limit or external truncation
         truncated = self.current_step >= self.max_steps

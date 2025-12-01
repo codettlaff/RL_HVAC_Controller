@@ -16,7 +16,7 @@ def train_MDP_controller(env):
         target_update_interval=500,
         verbose=1
     )
-    model.learn(total_timesteps=287)
+    model.learn(total_timesteps=50000)
     model.save("hvac_dqn")
 
 def train():
@@ -29,7 +29,7 @@ def train():
                           max_steps=288)
     train_MDP_controller(env)
 
-# train()
+train()
 
 '''
 data_folderpath = os.path.join(os.path.dirname(__file__), 'data')
