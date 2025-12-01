@@ -128,9 +128,9 @@ class HVACTrainingEnv(gym.Env):
         comfort_upper = 21.67
 
         if T < comfort_lower:
-            comfort_penalty = (comfort_lower - T) * 2.0
+            comfort_penalty = (comfort_lower - T[0]) * 2.0
         elif T > comfort_upper:
-            comfort_penalty = (T - comfort_upper) * 2.0
+            comfort_penalty = (T[0] - comfort_upper) * 2.0
         else:
             comfort_penalty = 0.0
 
@@ -142,7 +142,12 @@ class HVACTrainingEnv(gym.Env):
         # Higher price → larger penalty for HVAC power
         # Price in [0.1, 0.2]
         price = self.electricity_price
-        price_penalty = price * self.hvac_load
+        price_penalty = (price - 0.1) * 10
+
+        # --- Scaling ---
+        comfort_penalty = comfort_penalty * 10
+        switching_penalty = switching_penalty * 1
+        price_penalty = price_penalty * 1
 
         # --- Total reward ---
         # Negative because each is a penalty
