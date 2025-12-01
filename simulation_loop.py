@@ -7,6 +7,8 @@ import numpy as np
 
 def simulation_loop():
 
+    mode = 'baseline'
+
     data_folderpath = os.path.join(os.path.dirname(__file__), 'data')
     price_profile_df = pd.read_csv(os.path.join(data_folderpath, 'electricity_price.csv'))
     outdoor_temperature_df = pd.read_csv(os.path.join(data_folderpath, 'outdoor_temperature.csv'))
@@ -31,21 +33,26 @@ def simulation_loop():
         total_reward += reward
 
         building_temperature.append(obs['indoor_temperature'][0])
-        # if building_temperature[-1] > 21.67: action = 1
-        # else: action = 0
-        # --- Get action from trained RL model ---
-        processed_obs = {}
 
-        for k, v in obs.items():
-            # Convert ints/floats/lists to np.array
-            if not isinstance(v, np.ndarray):
-                v = np.array([v], dtype=np.float32)
-            # Ensure shape is (1, n)
-            v = v.reshape(1, -1)
-            processed_obs[k] = v
+        if mode=='baseline':
+            if building_temperature[-1] > 21.67: action = 1
+            else: action = 0
 
-        action, _ = model.predict(processed_obs, deterministic=True)
-        action = action[0]
+        if mode=='model':
+            # --- Get action from trained RL model ---
+            processed_obs = {}
+
+            for k, v in obs.items():
+                # Convert ints/floats/lists to np.array
+                if not isinstance(v, np.ndarray):
+                    v = np.array([v], dtype=np.float32)
+                # Ensure shape is (1, n)
+                v = v.reshape(1, -1)
+                processed_obs[k] = v
+
+            action, _ = model.predict(processed_obs, deterministic=True)
+            action = action[0]
+
         env.render()
 
     env.close()
