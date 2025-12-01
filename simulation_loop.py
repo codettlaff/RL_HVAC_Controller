@@ -45,6 +45,7 @@ def simulation_loop():
             processed_obs[k] = v
 
         action, _ = model.predict(processed_obs, deterministic=True)
+        action = action[0]
         env.render()
 
     env.close()
