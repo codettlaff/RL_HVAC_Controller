@@ -4,6 +4,7 @@ from gymnasium import spaces
 import numpy as np
 import pandas as pd
 from typing import Optional, Tuple, Dict, Any
+import matplotlib.pyplot as plt
 
 from building_model import rc_building_model
 
@@ -156,8 +157,8 @@ class HVACTrainingEnv(gym.Env):
 
         # --- Scaling ---
         comfort_penalty = comfort_penalty * 1
-        switching_penalty = switching_penalty * 1
-        price_penalty = price_penalty * 1
+        switching_penalty = switching_penalty * 0
+        price_penalty = price_penalty * 0
 
         # --- Total reward ---
         # Negative because each is a penalty
@@ -224,12 +225,46 @@ class HVACTrainingEnv(gym.Env):
         if self.render_mode == "human":
             print(f"Step: {self.current_step}, State: {self.state}")
 
-    def final_render(self):
+    def final_render(self, save_path="hvac_results.png"):
+        import matplotlib.pyplot as plt
+        import numpy as np
+
         print("Final results")
-        print("Indoor temperature:", self.indoor_temperature)
-        print("Hvac Load Profile:", self.hvac_load_profile)
-        print("Cost Profile:", self.cost_profile)
-        print("total_cost:", sum(self.cost_profile))
+        print("Indoor temperature (final):", self.indoor_temperature)
+        print("Total HVAC Cost:", sum(self.cost_profile))
+
+        # Convert profiles to arrays
+        temps = np.array(self.indoor_temperature_profile, dtype=float)
+        hvac = np.array(self.hvac_load_profile, dtype=float)
+
+        # Create subplots
+        fig, axes = plt.subplots(2, 1, figsize=(12, 6))
+
+        # --- Indoor Temperature ---
+        axes[0].plot(temps, label="Indoor Temperature (°C)")
+        axes[0].axhline(20.0, color='gray', linestyle='--', linewidth=1)
+        axes[0].axhline(21.67, color='gray', linestyle='--', linewidth=1)
+        axes[0].set_title("Indoor Temperature Profile")
+        axes[0].set_ylabel("°C")
+        axes[0].legend()
+        axes[0].grid(True)
+
+        # --- HVAC Load ---
+        axes[1].plot(hvac, label="HVAC Load (kW)", color="tab:red")
+        axes[1].set_title("HVAC Load Profile")
+        axes[1].set_ylabel("kW")
+        axes[1].set_xlabel("Timestep")
+        axes[1].legend()
+        axes[1].grid(True)
+
+        plt.tight_layout()
+
+        # ---- SAVE FIGURE ----
+        plt.savefig(save_path, dpi=300)
+        print(f"Saved plot to: {save_path}")
+
+        # Show on screen
+        plt.show()
 
     def close(self):
         """
