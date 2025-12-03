@@ -156,7 +156,7 @@ class HVACTrainingEnv(gym.Env):
         price_penalty = (price - 0.1) * 10
 
         # --- Scaling ---
-        comfort_penalty = comfort_penalty * 1
+        comfort_penalty = comfort_penalty * 10
         switching_penalty = switching_penalty * 0
         price_penalty = price_penalty * 0
 
