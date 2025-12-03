@@ -202,7 +202,7 @@ class HVACTrainingEnv(gym.Env):
         # ----- Update Stored Variables -----
         self.indoor_temperature_profile.append(self.indoor_temperature)
         self.hvac_load_profile.append(self.hvac_load)
-        self.cost_profile.append(self.non_hvac_load)
+        self.cost_profile.append(self.electricity_price*self.hvac_load)
 
         # ----- Check termination conditions -----
         # terminated: task completed or failed (absorbing)
