@@ -37,6 +37,11 @@ class HVACTrainingEnv(gym.Env):
         self.non_hvac_load = 0.0
         self.hvac_load = 0.0
 
+        # ----- Stored Variables -----
+        self.indoor_temperature_profile = []
+        self.hvac_load_profile = []
+        self.cost_profile = []
+
         # ----- Save config and render mode -----
         self.render_mode = render_mode
         self.env_config = env_config  # e.g. {"max_steps": 100, ...}
@@ -194,6 +199,11 @@ class HVACTrainingEnv(gym.Env):
         # ----- Compute reward -----
         reward = self._get_reward(last_timestep_hvac_load)
 
+        # ----- Update Stored Variables -----
+        self.indoor_temperature_profile.append(self.indoor_temperature)
+        self.hvac_load_profile.append(self.hvac_load)
+        self.cost_profile.append(self.non_hvac_load)
+
         # ----- Check termination conditions -----
         # terminated: task completed or failed (absorbing)
         # terminated = False  # e.g. abs(self.state[0]) > 10
@@ -213,6 +223,13 @@ class HVACTrainingEnv(gym.Env):
         """
         if self.render_mode == "human":
             print(f"Step: {self.current_step}, State: {self.state}")
+
+    def final_render(self):
+        print("Final results")
+        print("Indoor temperature:", self.indoor_temperature)
+        print("Hvac Load Profile:", self.hvac_load_profile)
+        print("Cost Profile:", self.cost_profile)
+        print("total_cost:", sum(self.cost_profile))
 
     def close(self):
         """

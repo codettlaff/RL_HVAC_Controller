@@ -56,6 +56,7 @@ def simulation_loop():
         env.render()
 
     env.close()
+    env.final_render()
     print("Total Reward: ", total_reward)
 
 simulation_loop()
