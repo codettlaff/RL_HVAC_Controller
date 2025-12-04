@@ -4,6 +4,7 @@ from environment import HVACTrainingEnv
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3 import DQN
 import numpy as np
+from stable_baselines3 import PPO
 
 def simulation_loop():
 
@@ -24,7 +25,8 @@ def simulation_loop():
     action = env.action_space.sample()
 
     # --- Load the trained DQN model ---
-    model = DQN.load("hvac_dqn_comfortonly_50000_timesteps.zip", env=env)
+    model = DQN.load("hvac_dqn.zip", env=env)
+    #model = PPO.load("hvac_ppo.zip", env=env)
 
     while not (done or truncated):
 

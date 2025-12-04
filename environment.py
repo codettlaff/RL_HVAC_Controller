@@ -126,6 +126,38 @@ class HVACTrainingEnv(gym.Env):
 
     def _get_reward(self, last_timestep_hvac_load):
         """
+        Smooth comfort-based reward:
+          - Quadratic penalty for deviation from comfort midpoint
+          - Optional switching/price penalties (currently disabled)
+        """
+
+        # Comfort band: 20.0°C – 21.67°C
+        T = self.indoor_temperature
+        comfort_lower = 20.0
+        comfort_upper = 21.67
+
+        # Midpoint and half-width (for smooth penalty)
+        T_mid = 0.5 * (comfort_lower + comfort_upper)  # ≈ 20.835
+        width = (comfort_upper - comfort_lower) / 2  # ≈ 0.835
+
+        # --- Smooth quadratic comfort penalty ---
+        # = 0 at midpoint, grows as we move away
+        comfort_penalty = ((T - T_mid) / width) ** 2
+
+        # --- Switching penalty (disabled for now) ---
+        switching_penalty = 0.0  # or: 1.0 if last_timestep_hvac_load != self.hvac_load else 0.0
+
+        # --- Price penalty (disabled for now) ---
+        price_penalty = 0.0
+
+        # --- Total penalty ---
+        total_penalty = comfort_penalty + switching_penalty + price_penalty
+
+        # Return reward (negative penalty)
+        return -total_penalty
+
+    def _get_reward_old(self, last_timestep_hvac_load):
+        """
         Computes reward based on:
           - Staying in comfort band (20°C to 21.67°C)
           - Avoiding HVAC on/off switching
@@ -138,12 +170,10 @@ class HVACTrainingEnv(gym.Env):
         comfort_lower = 20.0
         comfort_upper = 21.67
 
-        if T < comfort_lower:
-            comfort_penalty = (comfort_lower - T) * 2.0
-        elif T > comfort_upper:
-            comfort_penalty = (T - comfort_upper) * 2.0
+        if comfort_lower <= T <= comfort_upper:
+            comfort_penalty = 0  # good step
         else:
-            comfort_penalty = 0.0
+            comfort_penalty = 1  # bad step
 
         # --- Switching penalty ---
         # Penalize toggling HVAC on/off
