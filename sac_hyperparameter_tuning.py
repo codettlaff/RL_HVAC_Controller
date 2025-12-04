@@ -95,7 +95,7 @@ def sweep_sac():
                         )
 
                         # Train SAC for 50k timesteps
-                        model.learn(total_timesteps=50_000)
+                        model.learn(total_timesteps=500)
 
                         # Evaluate on full-day episode
                         loss = evaluate_model(model)
