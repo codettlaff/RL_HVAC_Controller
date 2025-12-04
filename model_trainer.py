@@ -3,6 +3,7 @@ import pandas as pd
 from environment import HVACTrainingEnv
 from stable_baselines3 import DQN
 from stable_baselines3 import PPO
+from stable_baselines3 import SAC
 
 def train_MDP_controller(env):
 
@@ -44,6 +45,32 @@ def train_MDP_controller_ppo(env):
     # Save the trained model
     model.save("hvac_ppo_optimized")
 
+def train_MDP_controller_sac(env):
+    """
+    Train a Soft Actor-Critic (SAC) model.
+    NOTE: SAC requires a continuous action space (gymnasium.spaces.Box).
+    Your environment must be updated before this will run.
+    """
+
+    model = SAC(
+        "MultiInputPolicy",
+        env,
+        learning_rate=3e-4,     # good default for SAC
+        gamma=0.99,             # long-horizon recommended
+        batch_size=256,         # SAC performs best with large batches
+        tau=0.005,              # target smoothing
+        train_freq=1,           # update every step
+        gradient_steps=1,       # 1 gradient update per step
+        ent_coef="auto",        # automatic entropy tuning
+        verbose=1
+    )
+
+    model.learn(total_timesteps=300_000)
+    model.save("hvac_sac")
+
+    print("SAC training complete and model saved as hvac_sac.zip")
+
+
 def train():
 
     data_folderpath = os.path.join(os.path.dirname(__file__), 'data')
@@ -52,10 +79,11 @@ def train():
     non_hvac_load_df = pd.read_csv(os.path.join(data_folderpath, 'non_hvac_load.csv'))
     env = HVACTrainingEnv(price_profile_df, outdoor_temperature_df, non_hvac_load_df, render_mode="human",
                           max_steps=288)
-    train_MDP_controller(env)
-    #train_MDP_controller_ppo(env)
+    # train_MDP_controller(env)
+    # train_MDP_controller_ppo(env)
+    train_MDP_controller_sac(env)
 
-#train()
+train()
 
 
 
