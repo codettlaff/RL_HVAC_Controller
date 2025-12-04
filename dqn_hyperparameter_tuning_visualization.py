@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # -------------------------------
-# Enter the tuning results
+# Hyperparameter sweep results
 # -------------------------------
 
-data = [
+dqn_data = [
     (1, 0.0001, 0.95, 50000, 0.05, 1475.61),
     (2, 0.0001, 0.95, 50000, 0.10, 1830.75),
     (3, 0.0001, 0.95, 50000, 0.20, 1386.25),
@@ -63,50 +63,12 @@ data = [
     (54, 0.001, 0.995, 100000, 0.20, 1441.92),
 ]
 
-df = pd.DataFrame(data, columns=[
-    "trial", "lr", "gamma", "buffer", "explore_frac", "loss"
-])
-
-print(df.head())
+data = dqn_data
+df = pd.DataFrame(data, columns=["trial", "lr", "gamma", "buffer", "explore_frac", "loss"])
 
 
 # -------------------------------
-# Visualization 1 — Loss by trial
-# -------------------------------
-
-plt.figure(figsize=(12,5))
-plt.plot(df["trial"], df["loss"], marker='o')
-plt.title("Hyperparameter Sweep: Total Loss by Trial")
-plt.xlabel("Trial #")
-plt.ylabel("Total Loss")
-plt.grid(alpha=0.3)
-plt.show()
-
-
-# -------------------------------
-# Visualization 2 — Scatter plots
-# -------------------------------
-
-fig, axes = plt.subplots(2, 2, figsize=(14,10))
-
-sns.scatterplot(ax=axes[0,0], data=df, x="lr", y="loss", hue="gamma")
-axes[0,0].set_title("Loss vs Learning Rate")
-
-sns.scatterplot(ax=axes[0,1], data=df, x="gamma", y="loss", hue="lr")
-axes[0,1].set_title("Loss vs Discount Factor")
-
-sns.scatterplot(ax=axes[1,0], data=df, x="buffer", y="loss", hue="lr")
-axes[1,0].set_title("Loss vs Buffer Size")
-
-sns.scatterplot(ax=axes[1,1], data=df, x="explore_frac", y="loss", hue="lr")
-axes[1,1].set_title("Loss vs Exploration Fraction")
-
-plt.tight_layout()
-plt.show()
-
-
-# -------------------------------
-# Visualization 3 — Heatmap grid
+# Create pivot for heatmap
 # -------------------------------
 
 pivot = df.pivot_table(
@@ -116,15 +78,18 @@ pivot = df.pivot_table(
     aggfunc="mean"
 )
 
-plt.figure(figsize=(10,6))
-sns.heatmap(pivot, annot=True, cmap="viridis")
-plt.title("Average Loss Heatmap: gamma vs. lr")
+# -------------------------------
+# Plot & save heatmap
+# -------------------------------
+
+plt.figure(figsize=(10, 6))
+sns.heatmap(pivot, annot=True, cmap="viridis", fmt=".1f")
+plt.title("DQN Hyperparameter Sweep — Mean Loss (gamma vs lr)")
+
+output_path = "dqn_hyperparam_heatmap.png"
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
+
+print(f"Saved heatmap to {output_path}")
+
 plt.show()
 
-
-# -------------------------------
-# Best trial
-# -------------------------------
-best = df.loc[df["loss"].idxmin()]
-print("\nBEST TRIAL:")
-print(best)
