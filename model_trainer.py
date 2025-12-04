@@ -7,19 +7,19 @@ from stable_baselines3 import PPO
 def train_MDP_controller(env):
 
     model = DQN(
-        #"MlpPolicy",
         "MultiInputPolicy",
         env,
-        learning_rate=1e-4, #1e-3
-        gamma = 0.9592903523242123,
-        buffer_size=50000,
-        exploration_fraction=0.1,
-        exploration_final_eps=0.02,
-        target_update_interval=500,
+        learning_rate=0.001,          # optimized
+        gamma=0.98,                   # optimized
+        buffer_size=100000,           # optimized
+        exploration_fraction=0.05,    # optimized
+        exploration_final_eps=0.02,   # unchanged
+        target_update_interval=500,   # unchanged
         verbose=1
     )
-    model.learn(total_timesteps=50000)
-    model.save("hvac_dqn")
+
+    model.learn(total_timesteps=500000)
+    model.save("hvac_dqn_optimized")
 
 # Very bad results
 def train_MDP_controller_ppo(env):
@@ -55,7 +55,7 @@ def train():
     train_MDP_controller(env)
     #train_MDP_controller_ppo(env)
 
-# train()
+#train()
 
 
 

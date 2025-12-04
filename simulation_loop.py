@@ -25,8 +25,8 @@ def simulation_loop():
     action = env.action_space.sample()
 
     # --- Load the trained DQN model ---
-    model = DQN.load("hvac_dqn_comfortonly_500000.zip", env=env)
-    #model = PPO.load("hvac_ppo.zip", env=env)
+    model = DQN.load("hvac_dqn", env=env)
+    #model = PPO.load("hvac_ppo", env=env)
 
     while not (done or truncated):
 
