@@ -266,37 +266,43 @@ class HVACTrainingEnv(gym.Env):
         print("Indoor temperature (final):", self.indoor_temperature)
         print("Total HVAC Cost:", sum(self.cost_profile))
 
-        # Convert profiles to arrays
         temps = np.array(self.indoor_temperature_profile, dtype=float)
         hvac = np.array(self.hvac_load_profile, dtype=float)
+        outdoor = np.array(self.outdoor_temperature_profile[:len(temps)], dtype=float)
 
         # Create subplots
         fig, axes = plt.subplots(2, 1, figsize=(12, 6))
 
-        # --- Indoor Temperature ---
-        axes[0].plot(temps, label="Indoor Temperature (°C)")
+        # ===============================
+        # 1. Indoor + Outdoor Temperature
+        # ===============================
+        axes[0].plot(temps, label="Indoor Temperature (°C)", color="tab:blue")
+        axes[0].plot(outdoor, label="Outdoor Temperature (°C)", color="tab:orange", alpha=0.8)
+
         axes[0].axhline(20.0, color='gray', linestyle='--', linewidth=1)
         axes[0].axhline(21.67, color='gray', linestyle='--', linewidth=1)
-        axes[0].set_title("Indoor Temperature Profile")
-        axes[0].set_ylabel("°C")
+
+        axes[0].set_title("Indoor vs. Outdoor Temperature (24-hour day)")
+        axes[0].set_ylabel("Temperature (°C)")
         axes[0].legend()
         axes[0].grid(True)
 
-        # --- HVAC Load ---
+        # ===============================
+        # 2. HVAC Load
+        # ===============================
         axes[1].plot(hvac, label="HVAC Load (kW)", color="tab:red")
         axes[1].set_title("HVAC Load Profile")
         axes[1].set_ylabel("kW")
-        axes[1].set_xlabel("Timestep")
+        axes[1].set_xlabel("Timestep (5-minute index)")
         axes[1].legend()
         axes[1].grid(True)
 
         plt.tight_layout()
 
-        # ---- SAVE FIGURE ----
+        # Save figure
         plt.savefig(save_path, dpi=300)
         print(f"Saved plot to: {save_path}")
 
-        # Show on screen
         plt.show()
 
     def close(self):
