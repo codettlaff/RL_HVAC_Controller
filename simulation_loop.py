@@ -25,9 +25,9 @@ def simulation_loop():
     action = env.action_space.sample()
 
     # --- Load the trained DQN model ---
-    path = os.path.join(os.path.dirname(__file__), 'comfort_only_results', 'hvac_dqn_optimized.zip')
-    model = DQN.load(path, env=env)
-    #model = PPO.load("hvac_ppo", env=env)
+    path = os.path.join(os.path.dirname(__file__), 'comfort_only_results', 'hvac_ppo_optimized.zip')
+    #model = DQN.load(path, env=env)
+    model = PPO.load(path, env=env)
 
     while not (done or truncated):
 
@@ -139,6 +139,6 @@ def run_baseline_and_plot(save_path="baseline_results.png"):
 
     plt.show()
 
-run_baseline_and_plot()
+# run_baseline_and_plot()
 
-# simulation_loop()
+simulation_loop()
