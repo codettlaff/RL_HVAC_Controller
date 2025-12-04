@@ -148,10 +148,13 @@ class HVACTrainingEnv(gym.Env):
         switching_penalty = 0.0  # or: 1.0 if last_timestep_hvac_load != self.hvac_load else 0.0
 
         # --- Price penalty (disabled for now) ---
-        price_penalty = 0.0
+        price_penalty = 1 - (0.2 - self.electricity_price)
 
         # --- Total penalty ---
-        total_penalty = comfort_penalty + switching_penalty + price_penalty
+        c1 = 1
+        c2 = 0
+        c3 = 0
+        total_penalty = c1 * comfort_penalty + c2 * switching_penalty + c3 * price_penalty
 
         # Return reward (negative penalty)
         return -total_penalty

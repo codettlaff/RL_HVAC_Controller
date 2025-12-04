@@ -21,28 +21,28 @@ def train_MDP_controller(env):
     model.learn(total_timesteps=500000)
     model.save("hvac_dqn_optimized")
 
-# Very bad results
 def train_MDP_controller_ppo(env):
 
     model = PPO(
         "MultiInputPolicy",
         env,
-        learning_rate=3e-4,          # stable for PPO
-        n_steps=2048,                # large batch for slow dynamics
-        batch_size=64,
-        gamma=0.995,                 # longer horizon → better anticipation
-        ent_coef=0.001,              # slight exploration encouragement
-        gae_lambda=0.95,             # good default for control tasks
-        clip_range=0.2,              # PPO clipping
-        vf_coef=0.5,
-        max_grad_norm=0.5,
+        learning_rate=5e-5,          # optimized LR
+        n_steps=256,                 # optimized rollout size
+        batch_size=256,              # optimized batch size
+        gamma=0.95,                  # optimized discount factor
+        ent_coef=0.001,              # unchanged (helps exploration)
+        gae_lambda=0.95,             # unchanged (good for control tasks)
+        clip_range=0.2,              # unchanged PPO clipping
+        vf_coef=0.5,                 # unchanged value function weight
+        max_grad_norm=0.5,           # unchanged for stability
         verbose=1
     )
 
-    # Train for more timesteps than DQN (PPO handles long runs well)
+    # Train PPO (longer training is beneficial)
     model.learn(total_timesteps=300_000)
 
-    model.save("hvac_ppo")
+    # Save the trained model
+    model.save("hvac_ppo_optimized")
 
 def train():
 
