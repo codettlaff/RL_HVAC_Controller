@@ -10,13 +10,10 @@ def train_MDP_controller(env):
         #"MlpPolicy",
         "MultiInputPolicy",
         env,
-        #learning_rate=1e-4, #1e-3
-        learning_rate = 0.0009702946520828864,
+        learning_rate=1e-4, #1e-3
         gamma = 0.9592903523242123,
-        #buffer_size=50000,
-        buffer_size = 20666,
+        buffer_size=50000,
         exploration_fraction=0.1,
-        #exploration_fraction = 0.31829426059574784,
         exploration_final_eps=0.02,
         target_update_interval=500,
         verbose=1
@@ -57,7 +54,8 @@ def train():
                           max_steps=288)
     train_MDP_controller(env)
     #train_MDP_controller_ppo(env)
-train()
+
+# train()
 
 
 

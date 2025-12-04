@@ -7,7 +7,6 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 
 from environment import HVACTrainingEnv
 
-
 # -----------------------------------------------------------
 #  Environment factory (needed for vectorized environments)
 # -----------------------------------------------------------
