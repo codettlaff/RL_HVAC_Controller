@@ -49,16 +49,15 @@ class HVACTrainingEnv(gym.Env):
 
         # ----- Define action space -----
         # Size-1 discrete action space: actions = {0, 1}
-        #self.action_space = spaces.Discrete(2)
+        self.action_space = spaces.Discrete(2)
         # Continuous Action Space for SAC
-        '''
-        
         '''
         self.action_space = spaces.Box(
             low=np.array([0.0], dtype=np.float32),
             high=np.array([2.5], dtype=np.float32),  # full HVAC power
             dtype=np.float32
         )
+        '''
 
         # ----- Define observation space -----
         # Dictionary observation space for multiple inputs
@@ -161,7 +160,7 @@ class HVACTrainingEnv(gym.Env):
 
         # --- Total penalty ---
         c1 = 1
-        c2 = 0
+        c2 = 1
         c3 = 0
         total_penalty = c1 * comfort_penalty + c2 * switching_penalty + c3 * price_penalty
 
@@ -220,9 +219,11 @@ class HVACTrainingEnv(gym.Env):
         # ----- Validate action -----
         assert self.action_space.contains(action), f"{action} is an invalid action"
 
+        '''
         # --- Convert SAC action to scalar ---
         if isinstance(action, np.ndarray):
             action = float(action.squeeze())
+        '''
 
         # ----- Apply action & update state -----
         # Example: simple state update (replace with your dynamics)
