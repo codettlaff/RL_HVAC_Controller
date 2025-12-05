@@ -76,11 +76,11 @@ def train():
     non_hvac_load_df = pd.read_csv(os.path.join(data_folderpath, 'non_hvac_load.csv'))
     env = HVACTrainingEnv(price_profile_df, outdoor_temperature_df, non_hvac_load_df, render_mode="human",
                           max_steps=288)
-    # train_MDP_controller(env)
+    train_MDP_controller(env)
     # train_MDP_controller_ppo(env)
-    train_MDP_controller_sac(env)
+    # train_MDP_controller_sac(env)
 
-# train()
+#train()
 
 
 

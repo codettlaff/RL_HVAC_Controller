@@ -26,10 +26,10 @@ def simulation_loop():
     action = env.action_space.sample()
 
     # --- Load the trained DQN model ---
-    path = os.path.join(os.path.dirname(__file__), 'comfort_only_results', 'hvac_sac_optimized.zip')
-    # model = DQN.load(path, env=env)
+    path = os.path.join(os.path.dirname(__file__), 'price_aware_results', 'hvac_dqn_optimized.zip')
+    model = DQN.load(path, env=env)
     # model = PPO.load(path, env=env)
-    model = SAC.load(path, env=env)
+    # model = SAC.load(path, env=env)
 
     while not (done or truncated):
 
