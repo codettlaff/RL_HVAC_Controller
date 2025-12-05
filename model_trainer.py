@@ -80,7 +80,7 @@ def train():
     # train_MDP_controller_ppo(env)
     train_MDP_controller_sac(env)
 
-train()
+# train()
 
 
 

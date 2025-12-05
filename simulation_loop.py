@@ -5,6 +5,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3 import DQN
 import numpy as np
 from stable_baselines3 import PPO
+from stable_baselines3 import SAC
 
 def simulation_loop():
 
@@ -25,9 +26,10 @@ def simulation_loop():
     action = env.action_space.sample()
 
     # --- Load the trained DQN model ---
-    path = os.path.join(os.path.dirname(__file__), 'comfort_only_results', 'hvac_ppo_optimized.zip')
-    #model = DQN.load(path, env=env)
-    model = PPO.load(path, env=env)
+    path = os.path.join(os.path.dirname(__file__), 'comfort_only_results', 'hvac_sac_optimized.zip')
+    # model = DQN.load(path, env=env)
+    # model = PPO.load(path, env=env)
+    model = SAC.load(path, env=env)
 
     while not (done or truncated):
 
